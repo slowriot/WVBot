@@ -1,12 +1,11 @@
 '''
     This class abstracts all the IRC stuff into a simple API
 '''
-import logging
 import re
-
+import logging
 from tornado import tcpclient, gen, ioloop
 
-logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 class IRC(object):
     def __init__(self):
@@ -22,7 +21,7 @@ class IRC(object):
     # Connects to the IRC server and returns a future
     @gen.coroutine
     def _connect_to_server(self):
-        logging.info("Connecting to IRC server - {0}:{1}".format(self.host, self.port))
+        logger.info("Connecting to IRC server - {0}:{1}".format(self.host, self.port))
         tcpclient_factory = tcpclient.TCPClient()
         self.conn = yield tcpclient_factory.connect(self.host, self.port)
         self.loopinstance.add_future(self._schedule_line(), self._line_received)
@@ -54,7 +53,7 @@ class IRC(object):
         self.loopinstance.add_future(self._schedule_line(), self._line_received)
 
     def _reply_ping(self, ping_line):
-        logging.debug("PING recieved, replying")
+        logger.debug("PING recieved, replying")
         reply_line = ping_line.replace("PING", "PONG")
         self._write_line(reply_line)
 
@@ -65,12 +64,12 @@ class IRC(object):
             self.joined_channels = True
 
     def _ident(self):
-        logging.info("Identing with server")
+        logger.info("Identing with server")
         self._write_line("USER {0} {1} {2} {3}".format(self.nick, self.nick, self.nick, self.nick))
         self._write_line("NICK {0}".format(self.nick))
 
     def _join_channel(self):
-        logging.info("Joining channel")
+        logger.info("Joining channel")
         self._write_line("JOIN {0}".format(self.channel))
 
     def start_connection(self):
@@ -79,17 +78,5 @@ class IRC(object):
         self.loopinstance.start()
 
     def _connection_complete(self, data):
-        logging.debug("Connection Complete")
+        logger.debug("Connection Complete")
         self._ident()
-
-irc = IRC()
-
-def main():
-    irc.channel_message_received_callback = channel_message
-    irc.start_connection()
-
-def channel_message(sender, channel, message):
-    print("Message from {0} in {1}: {2}".format(sender, channel, message))
-
-if __name__ == '__main__':
-    main()
