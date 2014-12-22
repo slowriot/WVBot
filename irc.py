@@ -13,40 +13,52 @@ class IRC(object):
     def __init__(self):
         self.host = "irc.imaginarynet.org.uk"
         self.port = 6667
+        self.nick = "WVBot"
+        self.conn = None
 
+    # Connects to the IRC server and returns a future
     @gen.coroutine
     def connect(self):
         logging.info("Connecting to IRC server - {0}:{1}".format(self.host, self.port))
         tcpclient_factory = tcpclient.TCPClient()
         self.conn = yield tcpclient_factory.connect(self.host, self.port)
         logging.info("Connected")
-        self.schedule_line()
 
+    # Returns a future that will return a line retrieved from the server
     def schedule_line(self):
-        self.conn.read_until(b'\n', self.line_callback)
+        return self.conn.read_until(b'\n')
 
-    def line_callback(self, data):
-        print(data)
-
-        # if data == b'NOTICE AUTH :*** Found your hostname\r\n':
-        #     self.write_line("JOIN #wvbot")
-
-        self.schedule_line()
-
-    def write_line(self, data):
+    # Sends a line of text to the server, used by other functions in this class
+    def _write_line(self, data):
         if data[-1] != '\n':
             data += '\n'
 
         self.conn.write(data.encode('utf8'))
 
+    def ident(self):
+        self._write_line("USER {0} {1} {2} {3}".format(self.nick, self.nick, self.nick, self.nick))
+        self._write_line("NICK {0}".format(self.nick))
+
+
+irc = IRC()
+
 def main():
 
     logging.debug("Adding callback")
-    irc = IRC()
-    loopinstance.add_callback(irc.connect)
-
+    loopinstance.add_future(irc.connect(), connection_complete)
+    
     logging.debug("Starting Loop Instance")
     loopinstance.start()
+
+
+def connection_complete(data):
+    irc.ident()
+    loopinstance.add_future(irc.schedule_line(), line_received)
+
+def line_received(line):
+    print(line.result())
+
+    loopinstance.add_future(irc.schedule_line(), line_received)
 
 if __name__ == '__main__':
     main()
