@@ -3,6 +3,7 @@
 '''
 import re
 import logging
+import chardet
 from tornado import tcpclient, gen, ioloop
 
 logger = logging.getLogger(__name__)
@@ -38,7 +39,15 @@ class IRC(object):
         self.conn.write(data.encode('utf8'))
 
     def _line_received(self, data):
-        line = data.result().decode('utf8')
+        line_bytes = data.result()
+        try:
+            line = line_bytes.decode('utf8')
+        except UnicodeDecodeError:
+            # If a line cannot be decoded as utf8, detect the encoding and decode using that
+            encoding = chardet.detect(line_bytes)['encoding']
+            line = line_bytes.decode(encoding)
+            logger.debug("Line could not be decoded as UTF-8, was instead decoded as {0}".format(encoding))
+
         if self.channel_message_received_callback != None:
             # We need to use a regex to check if this is a channel message and extract the
             # important bits from it
