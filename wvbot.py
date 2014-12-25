@@ -14,14 +14,16 @@ volunteering_regexes = [
     r'^It would be good if (.*)$'
 ]
 
+irc = IRC()
+
 def main():
-    irc = IRC()
     irc.channel_message_received_callback = channel_message
     irc.start_connection()
 
 def channel_message(sender, channel, message):
     for regex in volunteering_regexes:
-        if re.match(regex, message):
+        if re.match(regex, message, re.IGNORECASE):
+            irc.send_channel_message(channel, "{0}: Well Volunteered!".format(sender))
             logger.info("Well Volunteered message sent to {0} in {1}".format(sender, channel))
 
 if __name__ == '__main__':

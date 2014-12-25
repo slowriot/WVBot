@@ -89,3 +89,6 @@ class IRC(object):
     def _connection_complete(self, data):
         logger.debug("Connection Complete")
         self._ident()
+
+    def send_channel_message(self, channel, message):
+        self._write_line("PRIVMSG {0} :{1}".format(channel, message))
