@@ -5,7 +5,7 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 def main():
-    irc = IRC()
+    irc = IRC(host="irc.imaginarynet.org.uk", port=6667, nick="WVBot", channel="#bottest")
     irc.channel_message_received_callback = channel_message
     irc.start_connection()
 
