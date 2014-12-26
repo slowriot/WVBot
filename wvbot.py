@@ -1,5 +1,6 @@
 import logging
 import re
+import db
 from irc import IRC
 
 logging.basicConfig(level=logging.DEBUG)
@@ -18,7 +19,7 @@ irc = IRC(host="irc.imaginarynet.org.uk", port=6667, nick="WVBot", channel="#bot
 
 def main():
     irc.channel_message_received_callback = channel_message
-    irc.start_connection()
+    # irc.start_connection()
 
 def channel_message(sender, channel, message):
     for regex in volunteering_regexes:

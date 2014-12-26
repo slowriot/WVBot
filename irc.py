@@ -18,6 +18,7 @@ class IRC(object):
         self._loopinstance = ioloop.IOLoop.instance()
         self.channel_message_received_callback = None
         self._joined_channels = False
+        self._echo_received_lines = True
 
     # Connects to the IRC server and returns a future
     @gen.coroutine
@@ -48,6 +49,11 @@ class IRC(object):
             line = line_bytes.decode(encoding)
             logger.debug("Line could not be decoded as UTF-8, was instead decoded as {0}".format(encoding))
 
+        # This is used to display server messages while the connection is being established
+        if self._echo_received_lines:
+            line_display = line if (line[-1] != '\n') else line[0:-1]
+            logger.debug("Line Recieved: {0}".format(line_display))
+
         if self.channel_message_received_callback != None:
             # We need to use a regex to check if this is a channel message and extract the
             # important bits from it
@@ -71,6 +77,7 @@ class IRC(object):
         if not self._joined_channels:
             self._join_channel()
             self._joined_channels = True
+            self._echo_received_lines = False # Stop echoing received lines
 
     def _ident(self):
         logger.info("Identing with server")
@@ -78,7 +85,7 @@ class IRC(object):
         self._write_line("NICK {0}".format(self.nick))
 
     def _join_channel(self):
-        logger.info("Joining channel")
+        logger.info("Joining channels")
         self._write_line("JOIN {0}".format(self.channel))
 
     def start_connection(self):
