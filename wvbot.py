@@ -19,12 +19,14 @@ irc = IRC(host="irc.imaginarynet.org.uk", port=6667, nick="WVBot", channel="#bot
 
 def main():
     irc.channel_message_received_callback = channel_message
-    # irc.start_connection()
+    irc.start_connection()
 
 def channel_message(sender, channel, message):
     for regex in volunteering_regexes:
         if re.match(regex, message, re.IGNORECASE):
-            irc.send_channel_message(channel, "{0}: Well Volunteered!".format(sender))
+            db.insert_message(nick=sender, message=message, channel=channel)
+            num_recorded_messages = db.count_user_messages(nick=sender, channel=channel)
+            irc.send_channel_message(channel, "{0}: Well Volunteered! You have now volunteered to do {1} things!".format(sender, num_recorded_messages))
             logger.info("Well Volunteered message sent to {0} in {1}".format(sender, channel))
 
 if __name__ == '__main__':
