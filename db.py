@@ -1,8 +1,12 @@
 from sqlalchemy import create_engine, Column, Integer, String, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from configparser import ConfigParser
 
-engine = create_engine('sqlite:///db.sqlite', echo=True)
+config = ConfigParser()
+config.read('config.ini')
+
+engine = create_engine(config['Database']['connection_string'], echo=True)
 Session = sessionmaker(bind=engine)
 session = Session()
 

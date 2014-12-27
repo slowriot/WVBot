@@ -2,6 +2,10 @@ import logging
 import re
 import db
 from irc import IRC
+from configparser import ConfigParser
+
+config = ConfigParser()
+config.read('config.ini')
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -15,7 +19,10 @@ volunteering_regexes = [
     r'^It would be good if (.*)$'
 ]
 
-irc = IRC(host="irc.imaginarynet.org.uk", port=6667, nick="WVBot", channel="#bottest")
+irc = IRC(  host=config['IRC']['host'],
+            port=config['IRC']['port'],
+            nick=config['IRC']['nick'],
+            channel=config['IRC']['channel'])
 
 def main():
     irc.channel_message_received_callback = channel_message
