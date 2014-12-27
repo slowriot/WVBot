@@ -6,7 +6,7 @@ from configparser import ConfigParser
 config = ConfigParser()
 config.read('config.ini')
 
-engine = create_engine(config['Database']['connection_string'], echo=True)
+engine = create_engine(config['Database']['connection_string'], echo=False)
 Session = sessionmaker(bind=engine)
 session = Session()
 
