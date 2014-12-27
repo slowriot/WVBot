@@ -7,7 +7,8 @@ from configparser import ConfigParser
 config = ConfigParser()
 config.read('config.ini')
 
-logging.basicConfig(level=logging.DEBUG)
+log_level = logging.DEBUG if config['System'].getboolean('debug') else logging.INFO
+logging.basicConfig(level=log_level)
 logger = logging.getLogger(__name__)
 
 volunteering_regexes = [
