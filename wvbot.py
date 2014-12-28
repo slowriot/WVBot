@@ -48,13 +48,16 @@ def channel_message(sender, channel, message):
 
         if "what have i volunteered for" in statement.lower():
             volunteered = db.get_user_messages(nick=sender, channel=channel)
-            plural = 's'
-            if len(volunteered) == 1:
-                plural = ''
-                
-            irc.send_channel_message(channel, "{0}: You have volunteered for the following {1} thing{2}:".format(sender, len(volunteered), plural))
-            for item in volunteered:
-                irc.send_channel_message(channel, "{0}: {1}".format(item.nick, item.message))
+            if len(volunteered) > 0:
+                plural = 's'
+                if len(volunteered) == 1:
+                    plural = ''
+
+                    irc.send_channel_message(channel, "{0}: You have volunteered for the following {1} thing{2}:".format(sender, len(volunteered), plural))
+                    for item in volunteered:
+                        irc.send_channel_message(channel, "{0}: {1}".format(item.nick, item.message))
+            else:
+                 irc.send_channel_message(channel, "{0}: You haven't volunteered for anything!".format(sender))       
 
 if __name__ == '__main__':
     main()
