@@ -30,6 +30,9 @@ def main():
     irc.start_connection()
 
 def channel_message(sender, channel, message):
+    if config['System']['debug']:
+        logger.debug("[{0}] {1}: {2}".format(channel, sender, message))
+    
     for regex in volunteering_regexes:
         if re.match(regex, message, re.IGNORECASE):
             db.insert_message(nick=sender, message=message, channel=channel)
