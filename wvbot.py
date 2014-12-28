@@ -34,7 +34,10 @@ def channel_message(sender, channel, message):
         if re.match(regex, message, re.IGNORECASE):
             db.insert_message(nick=sender, message=message, channel=channel)
             num_recorded_messages = db.count_user_messages(nick=sender, channel=channel)
-            irc.send_channel_message(channel, "{0}: Well Volunteered! You have now volunteered to do {1} things!".format(sender, num_recorded_messages))
+            pluralstring = 's'
+            if num_recorded_messages == 1:
+                pluralstring = ''
+            irc.send_channel_message(channel, "{0}: Well Volunteered! You have now volunteered to do {1} thing{2}!".format(sender, num_recorded_messages, pluralstring))
             logger.info("Well Volunteered message sent to {0} in {1}".format(sender, channel))
 
 if __name__ == '__main__':
