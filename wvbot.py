@@ -43,5 +43,18 @@ def channel_message(sender, channel, message):
             irc.send_channel_message(channel, "{0}: Well Volunteered! You have now volunteered to do {1} thing{2}!".format(sender, num_recorded_messages, pluralstring))
             logger.info("Well Volunteered message sent to {0} in {1}".format(sender, channel))
 
+    if message.startswith(config['IRC']['nick']):
+        statement = message.split(config['IRC']['nick'], 1)[1]
+
+        if "what have i volunteered for" in statement.lower():
+            volunteered = db.get_user_messages(nick=sender, channel=channel)
+            plural = 's'
+            if len(volunteered) == 1:
+                plural = ''
+                
+            irc.send_channel_message(channel, "{0}: You have volunteered for the following {1} thing{2}:".format(sender, len(volunteered), plural))
+            for item in volunteered:
+                irc.send_channel_message(channel, "{0}: {1}".format(item.nick, item.message))
+
 if __name__ == '__main__':
     main()
