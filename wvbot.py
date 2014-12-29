@@ -30,6 +30,9 @@ def main():
     irc.start_connection()
 
 def channel_message(sender, channel, message):
+    if config['System']['debug']:
+        logger.debug("[{0}] {1}: {2}".format(channel, sender, message))
+    
     for regex in volunteering_regexes:
         if re.match(regex, message, re.IGNORECASE):
             db.insert_message(nick=sender, message=message, channel=channel)
@@ -39,6 +42,22 @@ def channel_message(sender, channel, message):
                 pluralstring = ''
             irc.send_channel_message(channel, "{0}: Well Volunteered! You have now volunteered to do {1} thing{2}!".format(sender, num_recorded_messages, pluralstring))
             logger.info("Well Volunteered message sent to {0} in {1}".format(sender, channel))
+
+    if message.startswith(config['IRC']['nick']):
+        statement = message.split(config['IRC']['nick'], 1)[1]
+
+        if "what have i volunteered for" in statement.lower():
+            volunteered = db.get_user_messages(nick=sender, channel=channel)
+            if len(volunteered) > 0:
+                plural = 's'
+                if len(volunteered) == 1:
+                    plural = ''
+
+                    irc.send_channel_message(channel, "{0}: You have volunteered for the following {1} thing{2}:".format(sender, len(volunteered), plural))
+                    for item in volunteered:
+                        irc.send_channel_message(channel, "{0}: {1}".format(item.nick, item.message))
+            else:
+                 irc.send_channel_message(channel, "{0}: You haven't volunteered for anything!".format(sender))       
 
 if __name__ == '__main__':
     main()
