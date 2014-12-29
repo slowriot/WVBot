@@ -20,6 +20,11 @@ volunteering_regexes = [
     r'^It would be good if (.*)$'
 ]
 
+listing_regexes = [
+    r'^ *what have i (volunteered for|agreed to|let myself in for)',
+    r'^ *omgwtflol'
+]
+
 irc = IRC(  host=config['IRC']['host'],
             port=config['IRC']['port'],
             nick=config['IRC']['nick'],
@@ -43,21 +48,22 @@ def channel_message(sender, channel, message):
             irc.send_channel_message(channel, "{0}: Well Volunteered! You have now volunteered to do {1} thing{2}!".format(sender, num_recorded_messages, pluralstring))
             logger.info("Well Volunteered message sent to {0} in {1}".format(sender, channel))
 
-    if message.startswith(config['IRC']['nick']):
-        statement = message.split(config['IRC']['nick'], 1)[1]
+    if message.startswith(config['IRC']['nick'] + ":"):
+        statement = message.split(":", 1)[1]
 
-        if "what have i volunteered for" in statement.lower():
-            volunteered = db.get_user_messages(nick=sender, channel=channel)
-            if len(volunteered) > 0:
-                plural = 's'
-                if len(volunteered) == 1:
-                    plural = ''
+        for regex in listing_regexes:
+            if re.match(regex, statement, re.IGNORECASE):
+                volunteered = db.get_user_messages(nick=sender, channel=channel)
+                if len(volunteered) > 0:
+                    plural = 's'
+                    if len(volunteered) == 1:
+                        plural = ''
 
                     irc.send_channel_message(channel, "{0}: You have volunteered for the following {1} thing{2}:".format(sender, len(volunteered), plural))
                     for item in volunteered:
                         irc.send_channel_message(channel, "{0}: {1}".format(item.nick, item.message))
-            else:
-                 irc.send_channel_message(channel, "{0}: You haven't volunteered for anything!".format(sender))       
+                else:
+                    irc.send_channel_message(channel, "{0}: You haven't volunteered for anything!".format(sender))       
 
 if __name__ == '__main__':
     main()
