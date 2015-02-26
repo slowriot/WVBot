@@ -17,11 +17,12 @@ volunteering_regexes = [
     r'^Tardis should (.*)$',
     r'^Someone (should|needs to) (.*)$',
     r'^(Please )?(Can|Could) someone (.*)$',
-    r'^It would be good if (.*)$'
+    r'^(It|What) would be good (was )?if (.*)$'
 ]
 
 listing_regexes = [
-    r'^ *what have i (volunteered for|agreed to|let myself in for)',
+    r'^ *what have i (volunteered for|agreed to|let myself in for|got myself in ?to)',
+    r'^ *(oh,? )? for (fuck|pete\'?s|christ\'?s) sake',
     r'^ *omgwtflol'
 ]
 
