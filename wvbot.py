@@ -14,7 +14,9 @@ logger = logging.getLogger(__name__)
 volunteering_regexes = [
     r'^(I think )?(that )?We should (.*)$',
     r'^Why don\'t we (.*)$',
-    r'^Tardis should (.*)$',
+    r'^MCO should (.*)$',
+    r'^(slow)?riot should (.*)$',
+    r'^(slow)?riot.* should (.*)$',
     r'^Someone (should|needs to) (.*)$',
     r'^(Please )?(Can|Could) someone (.*)$',
     r'^It would be good if (.*)$'
