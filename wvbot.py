@@ -17,7 +17,7 @@ volunteering_regexes = [
     r'^MCO should (.*)$',
     r'^(slow)?riot should (.*)$',
     r'^(slow)?riot.* should (.*)$',
-    r'^Someone (should|needs to) (.*)$',
+    r'^Someone (should|needs to|ought to|must) (.*)$',
     r'^(Please )?(Can|Could) someone (.*)$',
     r'^(It|What) would be good (was )?if (.*)$'
 ]
